@@ -130,6 +130,27 @@ function editContact(id, name, email, phone) {
         body: new URLSearchParams({ id, name: newName, email: newEmail, phone: newPhone })
     }).then(() => loadContacts());
 }
+function exportCSV() {
+    if (allContacts.length === 0) {
+        alert("No contacts to export.");
+        return;
+    }
+
+    const headers = ["Name", "Email", "Phone"];
+    const rows = allContacts.map(c => [c.name, c.email, c.phone]);
+
+    let csvContent = "data:text/csv;charset=utf-8," 
+        + headers.join(",") + "\n"
+        + rows.map(e => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "contacts.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 
 
 function deleteContact(id) {
