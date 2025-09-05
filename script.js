@@ -151,6 +151,22 @@ function exportCSV() {
     link.click();
     document.body.removeChild(link);
 }
+function clearAllContacts() {
+    if (confirm("Are you sure you want to delete all contacts? This action cannot be undone.")) {
+        fetch("delete_all_contacts.php", {
+            method: "POST"
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadContacts();
+                alert("All contacts have been deleted.");
+            } else {
+                alert("Failed to delete contacts: " + data.error);
+            }
+        });
+    }
+}
 
 
 function deleteContact(id) {
