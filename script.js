@@ -35,6 +35,40 @@ function loadContacts() {
             });
         });
 }
+let allContacts = [];
+
+function loadContacts() {
+    fetch("fetch_contacts.php")
+        .then(response => response.json())
+        .then(data => {
+            allContacts = data;
+            displayContacts(data);
+        });
+}
+
+function displayContacts(contacts) {
+    const contactList = document.getElementById("contactList");
+    contactList.innerHTML = "";
+    contacts.forEach(contact => {
+        let li = document.createElement("li");
+        li.innerHTML = `
+            Name: ${contact.name} - Email: ${contact.email} - Phone: ${contact.phone}
+            <button class="edit" onclick="editContact(${contact.id}, '${contact.name}', '${contact.email}', '${contact.phone}')">✏️</button>
+            <button class="delete" onclick="deleteContact(${contact.id})">🗑️</button>
+        `;
+        contactList.appendChild(li);
+    });
+}
+
+function searchContacts() {
+    const query = document.getElementById("search").value.toLowerCase();
+    const filtered = allContacts.filter(contact =>
+        contact.name.toLowerCase().includes(query) ||
+        contact.email.toLowerCase().includes(query) ||
+        contact.phone.toLowerCase().includes(query)
+    );
+    displayContacts(filtered);
+}
 
 function addContact() {
     const name = document.getElementById("name").value.trim();
@@ -96,6 +130,7 @@ function editContact(id, name, email, phone) {
         body: new URLSearchParams({ id, name: newName, email: newEmail, phone: newPhone })
     }).then(() => loadContacts());
 }
+
 
 function deleteContact(id) {
     if (confirm("Are you sure you want to delete this contact?")) {
