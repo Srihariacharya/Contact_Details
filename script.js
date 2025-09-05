@@ -104,13 +104,17 @@ function addContact() {
         loadContacts();
     }).catch(err => console.log(err));
 }
-
 function editContact(id, name, email, phone) {
     const newName = prompt("Edit Name:", name);
-    const newEmail = prompt("Edit Email:", email);
-    const newPhone = prompt("Edit Phone:", phone);
+    if (newName === null) return; // User cancelled
 
-    if (!newName || !newEmail || !newPhone) {
+    const newEmail = prompt("Edit Email:", email);
+    if (newEmail === null) return;
+
+    const newPhone = prompt("Edit Phone:", phone);
+    if (newPhone === null) return;
+
+    if (!newName.trim() || !newEmail.trim() || !newPhone.trim()) {
         alert("All fields are required!");
         return;
     }
@@ -127,9 +131,21 @@ function editContact(id, name, email, phone) {
 
     fetch("update_contact.php", {
         method: "POST",
-        body: new URLSearchParams({ id, name: newName, email: newEmail, phone: newPhone })
-    }).then(() => loadContacts());
+        body: new URLSearchParams({ id, name: newName.trim(), email: newEmail.trim(), phone: newPhone.trim() })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadContacts();
+        } else {
+            alert("Update failed: " + (data.error || "Unknown error"));
+        }
+    })
+    .catch(err => {
+        alert("Error updating contact: " + err);
+    });
 }
+
 function exportCSV() {
     if (allContacts.length === 0) {
         alert("No contacts to export.");
